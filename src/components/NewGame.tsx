@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "./Button";
-import { Database } from "@/lib/database.types";
 import { InputComponent } from "./Input";
 import RadioButton from "./RadioButton";
 // @ts-ignore
@@ -46,6 +45,7 @@ export const NewGame = () => {
         },
       ],
       cards: gameBoard,
+      currentPlayer: userId,
     });
   };
 

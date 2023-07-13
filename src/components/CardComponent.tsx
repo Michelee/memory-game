@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { getCardIconLabel } from "@/utils/getCardIconLabel";
 
 interface CardComponentProps {
   value: string;
@@ -19,13 +20,13 @@ const CardComponent = ({
 }: CardComponentProps) => {
   return (
     <button
-      className={`bg-blue-500 hover:bg-blue-700 text-white font-bold h-12 w-12 rounded cursor-pointer  ${
+      className={`bg-blue-500 hover:bg-blue-700 text-white font-bold h-16 w-16 rounded cursor-pointer flex items-center justify-center ${
         flipped && !matched ? "bg-orange-500" : ""
       } ${matched && flipped ? "bg-green-500 hover:bg-green-500" : ""}`}
       onClick={handleClick}
       disabled={disabled || matched}
     >
-      {flipped || matched ? value : ""}
+      {flipped || matched ? getCardIconLabel(value) : ""}
     </button>
   );
 };
