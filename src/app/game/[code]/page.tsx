@@ -2,7 +2,7 @@ import { CardsProps } from "@/utils/gameTypes";
 import GameBoard from "@/components/GameBoard";
 import React from "react";
 import { cookies } from "next/headers";
-import supabase from "../../../utils/supabase";
+import supabase from "@/utils/supabase";
 
 const Game = async ({ params }: { params: { code: string } }) => {
   const cookieStore = cookies();
@@ -23,13 +23,17 @@ const Game = async ({ params }: { params: { code: string } }) => {
         <h1 className="text-2xl font-bold">memory</h1>
       </div>
       <div className="grid">
-        <GameBoard
-          gameCards={cards || []}
-          gamePlayer={players || []}
-          boardId={params.code}
-          userId={userId}
-          player={currentPlayer}
-        />
+        {currentPlayer ? (
+          <GameBoard
+            gameCards={cards || []}
+            gamePlayer={players || []}
+            boardId={params.code}
+            userId={userId}
+            player={currentPlayer}
+          />
+        ) : (
+          <span className="text-2xl inline-block mx-auto my-20">Sorry, game not found</span>
+        )}
       </div>
     </main>
   );

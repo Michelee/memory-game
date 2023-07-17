@@ -20,7 +20,7 @@ export const Home = () => {
       />
       <Button
         label="Play alone"
-        onClick={() => router.push("/game")}
+        onClick={() => router.push("/play-alone")}
         classes="bg-green-500 hover:bg-green-700 text-white w-full mt-8"
       />
     </div>

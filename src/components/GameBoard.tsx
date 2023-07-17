@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import CardComponent from "@/components/CardComponent";
 import Countdown from "./Countdown";
 import { GameActionBar } from "./GameActionBar";
+import { TrophyIcon } from "./Icons/TrophyIcon";
 import supabase from "@/utils/supabase";
 
 interface GameProps {
@@ -27,6 +28,7 @@ const Game = ({
   const [players, setPlayers] = useState<PlayersProps[]>(gamePlayer);
   const [currentPlayer, setCurrentPlayer] = useState(player);
   const [seconds, setSeconds] = useState(30);
+  const [endgame, setEndgame] = useState(false);
 
   useEffect(() => {
     const channel = supabase
@@ -39,7 +41,7 @@ const Game = ({
           table: "game",
           filter: `boardId=eq.${boardId}`,
         },
-        (payload) => {
+        async (payload) => {
           const playersUpdated: PlayersProps[] = payload.new.players;
           const newCards: CardsProps[] = payload.new.cards;
           let newCurrentPlayer = payload.new.currentPlayer;
@@ -58,7 +60,7 @@ const Game = ({
                   }
                 });
                 playersUpdated.forEach((player) => {
-                  if (player.id === userId) {
+                  if (player.id === currentPlayer) {
                     player.score += 1;
                   }
                 });
@@ -84,15 +86,24 @@ const Game = ({
                   cards: newCards,
                   players: playersUpdated,
                   currentPlayer: newCurrentPlayer,
+                  timer: 30,
                 })
                 .eq("boardId", boardId);
             }
           }, 500);
 
-          setCards(newCards);
-          setPlayers(playersUpdated);
-          setCurrentPlayer(newCurrentPlayer);
-          setSeconds(payload.new.timer);
+          const isEndGame =
+            newCards.filter((card) => card.matched).length === newCards.length;
+          setEndgame(isEndGame);
+
+          if (isEndGame) {
+            await supabase.from("game").delete().eq("boardId", boardId);
+          } else {
+            setCards(newCards);
+            setPlayers(playersUpdated);
+            setCurrentPlayer(newCurrentPlayer);
+            setSeconds(payload.new.timer);
+          }
         }
       )
       .subscribe();
@@ -164,61 +175,79 @@ const Game = ({
   return (
     <>
       {players.length === 1 && <GameActionBar boardId={boardId} />}
-      {players.length > 1 && (
+      {players.length > 1 && !endgame && (
         <Countdown
           seconds={seconds}
           handleCountdown={handleCountdown}
           setTimeOut={handleTimeOut}
         />
       )}
-      <div className="flex flex-col max-w-screen-md mb-8 p-5 my-0 mx-auto">
-        {players.length === 1 && (
-          <div className="my-5 flex justify-between">
-            <span className="text-xl">Score</span>
-            <span className="text-xl">{players[0].score}</span>
-          </div>
-        )}
-        <div
-          className={`grid gap-2 ${
-            cards.length > 16 ? "grid-cols-6" : "grid-cols-4"
-          }`}
-        >
-          {cards.map((props, index) => (
-            <CardComponent
-              key={index}
-              value={props.card}
-              flipped={props.flipped}
-              matched={props.matched}
-              disabled={
-                cards.filter((e) => e.flipped && !e.matched).length === 2 ||
-                currentPlayer !== userId
-              }
-              handleClick={() => handleClick(index)}
-            />
-          ))}
-        </div>
-      </div>
-      <div className={`grid grid-row gap-4 md:grid-cols-${players.length}`}>
-        {players.length > 1 ? (
-          <>
-            {players.map((player) => (
-              <div
-                key={player.id}
-                className={`${
-                  currentPlayer === player.id
-                    ? "bg-orange-500 text-white"
-                    : "bg-slate-400 text-slate-800"
-                } flex justify-between align-center p-2 md:flex-col md:p-5 rounded-md`}
-              >
-                <span className="text-md md:mb-4">{player.name}</span>
-                <span className="text-xl">{player.score}</span>
-              </div>
+      {endgame ? (
+        <div className="my-24 max-w-screen-md mx-auto text-center">
+          <span className="text-4xl text-green-500 block">End Game!</span>
+          {players
+            .sort((a, b) => b.score - a.score)
+            .map((player, index) => (
+              <span key={player.id} className="text-xl my-8 block">
+                {player.name}
+                {"  "}
+                {player.score} points
+                {index === 0 && <TrophyIcon classes="inline-flex ml-2 mb-3" />}
+              </span>
             ))}
-          </>
-        ) : (
-          ""
-        )}
-      </div>
+        </div>
+      ) : (
+        <>
+          <div className="flex flex-col max-w-screen-md mb-8 p-5 my-0 mx-auto">
+            {players.length === 1 && (
+              <div className="my-5 flex justify-between">
+                <span className="text-xl">Score</span>
+                <span className="text-xl">{players[0].score}</span>
+              </div>
+            )}
+            <div
+              className={`grid gap-2 ${
+                cards.length > 16 ? "grid-cols-6" : "grid-cols-4"
+              }`}
+            >
+              {cards.map((props, index) => (
+                <CardComponent
+                  key={index}
+                  value={props.card}
+                  flipped={props.flipped}
+                  matched={props.matched}
+                  disabled={
+                    cards.filter((e) => e.flipped && !e.matched).length === 2 ||
+                    currentPlayer !== userId
+                  }
+                  handleClick={() => handleClick(index)}
+                />
+              ))}
+            </div>
+          </div>
+          <div className={`grid grid-row gap-4 md:grid-cols-${players.length}`}>
+            {players.length > 1 ? (
+              <>
+                {players.map((player) => (
+                  <div
+                    key={player.id}
+                    className={`${
+                      currentPlayer === player.id
+                        ? "bg-orange-500 text-white"
+                        : "bg-slate-400 text-slate-800"
+                    } flex justify-between align-center p-2 md:flex-col md:p-5 rounded-md`}
+                  >
+                    <span className="text-md md:mb-4">{player.name}</span>
+                    <span className="text-xl">{player.score}</span>
+                  </div>
+                ))}
+              </>
+            ) : (
+              ""
+            )}
+          </div>
+        </>
+      )}
     </>
   );
 };

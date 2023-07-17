@@ -2,6 +2,10 @@
 
 I built this demo project to explore more about [Next.js](https://nextjs.org/), and learn about [server components](https://nextjs.org/docs/getting-started/react-essentials#server-components).
 
+![Memory game app](public/memory.png)
+
+Check the demo here [Memory Game](https://memory-game-micheleancheta.vercel.app/)
+
 ## Getting Started
 
 First, run the development server:
