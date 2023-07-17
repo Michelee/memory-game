@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import CardComponent from "@/components/CardComponent";
 import Countdown from "./Countdown";
 import { GameActionBar } from "./GameActionBar";
+import { GameOver } from "./GameOver";
 import { TrophyIcon } from "./Icons/TrophyIcon";
 import supabase from "@/utils/supabase";
 
@@ -124,7 +125,7 @@ const Game = ({
     let newCurrentPlayer = data?.[0]?.currentPlayer;
 
     const playerIndex = newPlayers.findIndex(
-      (player) => player.id === newCurrentPlayer
+      (player) => player.id === currentPlayer
     );
 
     newCurrentPlayer =
@@ -183,19 +184,7 @@ const Game = ({
         />
       )}
       {endgame ? (
-        <div className="my-24 max-w-screen-md mx-auto text-center">
-          <span className="text-4xl text-green-500 block">End Game!</span>
-          {players
-            .sort((a, b) => b.score - a.score)
-            .map((player, index) => (
-              <span key={player.id} className="text-xl my-8 block">
-                {player.name}
-                {"  "}
-                {player.score} points
-                {index === 0 && <TrophyIcon classes="inline-flex ml-2 mb-3" />}
-              </span>
-            ))}
-        </div>
+        <GameOver playersList={players} />
       ) : (
         <>
           <div className="flex flex-col max-w-screen-md mb-8 p-5 my-0 mx-auto">
@@ -225,7 +214,13 @@ const Game = ({
               ))}
             </div>
           </div>
-          <div className={`grid grid-row gap-4 md:grid-cols-${players.length}`}>
+          <div
+            className={`grid grid-row gap-4 ${
+              players.length === 2 && " md:grid-cols-2"
+            } ${players.length === 3 && " md:grid-cols-3"} ${
+              players.length === 4 && " md:grid-cols-4"
+            }`}
+          >
             {players.length > 1 ? (
               <>
                 {players.map((player) => (
