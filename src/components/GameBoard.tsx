@@ -195,13 +195,14 @@ const Game = ({
               </div>
             )}
             <div
-              className={`grid gap-2 ${
+              className={`grid gap-4 md:gap-2 ${
                 cards.length > 16 ? "grid-cols-6" : "grid-cols-4"
               }`}
             >
               {cards.map((props, index) => (
                 <CardComponent
                   key={index}
+                  classes={cards.length > 16 ? "h-12 w-12 md:h-16 md:w-16" : "h-16 w-16"}
                   value={props.card}
                   flipped={props.flipped}
                   matched={props.matched}

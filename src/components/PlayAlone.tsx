@@ -1,10 +1,10 @@
 "use client";
 
-import { CardsProps, PlayersProps } from "@/utils/gameTypes";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Button } from "./Button";
 import CardComponent from "@/components/CardComponent";
+import { CardsProps } from "@/utils/gameTypes";
 import { useRouter } from "next/navigation";
 
 interface PlayAloneProps {
@@ -62,7 +62,7 @@ const PlayAlone = ({ gameCards }: PlayAloneProps) => {
   };
 
   return (
-    <div className="flex flex-col max-w-screen-md mb-8 p-5 my-0 mx-auto">
+    <div className="flex flex-col md:max-w-screen-md mb-8 p-5 my-0 mx-auto">
       {score === 8 ? (
         <div className="items-center flex flex-col my-10">
           <div className="text-2xl inline-block mx-auto my-10">You Win!</div>
@@ -87,12 +87,13 @@ const PlayAlone = ({ gameCards }: PlayAloneProps) => {
             <span className="text-xl">{score}</span>
           </div>
           <div
-            className={`grid gap-2 ${
+            className={`grid gap-4 md:gap-2 ${
               cards.length > 16 ? "grid-cols-6" : "grid-cols-4"
             }`}
           >
             {cards.map((props, index) => (
               <CardComponent
+                classes={cards.length > 16 ? "h-12 w-12 md:h-16 md:w-16" : "h-16 w-16"}
                 key={index}
                 value={props.card}
                 flipped={props.flipped}

@@ -1,5 +1,6 @@
 import { CardsProps } from "@/utils/gameTypes";
 import GameBoard from "@/components/GameBoard";
+import PageLayout from "@/components/PageLayout";
 import React from "react";
 import { cookies } from "next/headers";
 import supabase from "@/utils/supabase";
@@ -18,24 +19,21 @@ const Game = async ({ params }: { params: { code: string } }) => {
   const currentPlayer = data?.[0]?.currentPlayer;
 
   return (
-    <main className="flex flex-col max-w-screen-md min-h-screen p-5 my-0 mx-auto relative">
-      <div className="text-left max-w-screen">
-        <h1 className="text-2xl font-bold">memory</h1>
-      </div>
-      <div className="grid">
-        {currentPlayer ? (
-          <GameBoard
-            gameCards={cards || []}
-            gamePlayer={players || []}
-            boardId={params.code}
-            userId={userId}
-            player={currentPlayer}
-          />
-        ) : (
-          <span className="text-2xl inline-block mx-auto my-20">Sorry, game not found</span>
-        )}
-      </div>
-    </main>
+    <PageLayout>
+      {currentPlayer ? (
+        <GameBoard
+          gameCards={cards || []}
+          gamePlayer={players || []}
+          boardId={params.code}
+          userId={userId}
+          player={currentPlayer}
+        />
+      ) : (
+        <span className="text-2xl inline-block mx-auto my-20">
+          Sorry, game not found
+        </span>
+      )}
+    </PageLayout>
   );
 };
 
