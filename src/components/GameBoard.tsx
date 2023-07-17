@@ -4,6 +4,8 @@ import { CardsProps, PlayersProps } from "@/utils/gameTypes";
 import React, { useEffect, useState } from "react";
 
 import CardComponent from "@/components/CardComponent";
+import Countdown from "./Countdown";
+import { GameActionBar } from "./GameActionBar";
 import supabase from "@/utils/supabase";
 
 interface GameProps {
@@ -24,6 +26,7 @@ const Game = ({
   const [cards, setCards] = useState<CardsProps[]>(gameCards);
   const [players, setPlayers] = useState<PlayersProps[]>(gamePlayer);
   const [currentPlayer, setCurrentPlayer] = useState(player);
+  const [seconds, setSeconds] = useState(30);
 
   useEffect(() => {
     const channel = supabase
@@ -41,11 +44,11 @@ const Game = ({
           const newCards: CardsProps[] = payload.new.cards;
           let newCurrentPlayer = payload.new.currentPlayer;
 
-          const flippedCards = newCards.filter(
-            (card) => card.flipped && !card.matched
-          );
-
           setTimeout(async () => {
+            const flippedCards = newCards.filter(
+              (card) => card.flipped && !card.matched
+            );
+
             if (flippedCards.length === 2) {
               const [firstCard, secondCard] = flippedCards;
               if (firstCard.card === secondCard.card) {
@@ -89,6 +92,7 @@ const Game = ({
           setCards(newCards);
           setPlayers(playersUpdated);
           setCurrentPlayer(newCurrentPlayer);
+          setSeconds(payload.new.timer);
         }
       )
       .subscribe();
@@ -97,6 +101,56 @@ const Game = ({
       channel.unsubscribe();
     };
   }, [boardId, cards, currentPlayer, userId]);
+
+  const handleTimeOut = async () => {
+    const { data } = await supabase
+      .from("game")
+      .select()
+      .eq("boardId", boardId);
+
+    const newPlayers: PlayersProps[] = data?.[0]?.players;
+    const newCards: CardsProps[] = data?.[0]?.cards;
+    let newCurrentPlayer = data?.[0]?.currentPlayer;
+
+    const playerIndex = newPlayers.findIndex(
+      (player) => player.id === newCurrentPlayer
+    );
+
+    newCurrentPlayer =
+      playerIndex + 1 === newPlayers.length
+        ? newPlayers[0].id
+        : newPlayers[playerIndex + 1].id;
+
+    newCards.forEach((card) => {
+      if (card.flipped && !card.matched) {
+        card.flipped = false;
+      }
+    });
+
+    await supabase
+      .from("game")
+      .update({
+        cards: newCards,
+        players: newPlayers,
+        currentPlayer: newCurrentPlayer,
+        timer: 30,
+      })
+      .eq("boardId", boardId);
+
+    setCards(newCards);
+    setPlayers(newPlayers);
+    setCurrentPlayer(newCurrentPlayer);
+    setSeconds(30);
+  };
+
+  const handleCountdown = async (timer: number) => {
+    await supabase
+      .from("game")
+      .update({
+        timer,
+      })
+      .eq("boardId", boardId);
+  };
 
   const handleClick = async (index: number) => {
     const newCards = [...cards];
@@ -109,6 +163,14 @@ const Game = ({
 
   return (
     <>
+      {players.length === 1 && <GameActionBar boardId={boardId} />}
+      {players.length > 1 && (
+        <Countdown
+          seconds={seconds}
+          handleCountdown={handleCountdown}
+          setTimeOut={handleTimeOut}
+        />
+      )}
       <div className="flex flex-col max-w-screen-md mb-8 p-5 my-0 mx-auto">
         {players.length === 1 && (
           <div className="my-5 flex justify-between">
@@ -136,7 +198,7 @@ const Game = ({
           ))}
         </div>
       </div>
-      <div className="flex flex-row justify-evenly gap-2">
+      <div className={`grid grid-row gap-4 md:grid-cols-${players.length}`}>
         {players.length > 1 ? (
           <>
             {players.map((player) => (
@@ -146,9 +208,9 @@ const Game = ({
                   currentPlayer === player.id
                     ? "bg-orange-500 text-white"
                     : "bg-slate-400 text-slate-800"
-                } flex flex-col p-5 rounded-md basis-1/4`}
+                } flex justify-between align-center p-2 md:flex-col md:p-5 rounded-md`}
               >
-                <span className="text-md mb-4">{player.name}</span>
+                <span className="text-md md:mb-4">{player.name}</span>
                 <span className="text-xl">{player.score}</span>
               </div>
             ))}

@@ -19,7 +19,7 @@ const RadioButton = ({
 }: RadioButtonProps) => {
   return (
   <div className="flex text-left max-w-xs my-1 mr-8">
-    <label htmlFor={name} className="mr-2">
+    <label htmlFor={name} className="mr-2 text-sm">
       {label}
     </label>
     <input

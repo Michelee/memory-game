@@ -74,8 +74,8 @@ export const NewGame = () => {
             handleChange={(val: string) => setPlayerName(val)}
           />
 
-          <h3 className="inline-block my-2 text-left">Cards theme</h3>
-          <div className="flex my-3 relative">
+          <h3 className="inline-block mb-1 mt-4 text-left">Theme</h3>
+          <div className="flex relative">
             <RadioButton
               label="Numbers"
               name="theme"
@@ -92,8 +92,8 @@ export const NewGame = () => {
             />
           </div>
 
-          <h3 className="inline-block my-2">Grid size</h3>
-          <div className="flex my-3 mx-auto relative">
+          <h3 className="inline-block mb-1 mt-5">Size</h3>
+          <div className="flex mx-auto relative">
             <RadioButton
               label="4x4"
               name="size"

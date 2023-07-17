@@ -45,6 +45,7 @@ export const JoinGame = () => {
               score: 0,
             },
           ],
+          timer: 60,
         })
         .eq("boardId", gameCode);
       router.push(`/game/${gameCode}`);

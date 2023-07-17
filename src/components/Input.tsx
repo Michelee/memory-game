@@ -8,8 +8,8 @@ interface InputComponentProps {
 }
 
 export const InputComponent = ({ label, value, name, handleChange }: InputComponentProps) => (
-  <div className="flex flex-col text-left max-w-xs my-3 mx-auto relative">
-    <label htmlFor={name} className="mr-2 mb-2 font-bold">
+  <div className="flex flex-col text-left max-w-xs my-4 mx-auto relative">
+    <label htmlFor={name} className="mr-2 mb-2">
       {label}
     </label>
     <input

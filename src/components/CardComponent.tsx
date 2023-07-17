@@ -20,7 +20,7 @@ const CardComponent = ({
 }: CardComponentProps) => {
   return (
     <button
-      className={`bg-blue-500 hover:bg-blue-700 text-white font-bold h-16 w-16 rounded cursor-pointer flex items-center justify-center ${
+      className={`bg-blue-500 hover:bg-blue-700 text-white font-bold h-10 w-10 md:h-16 md:w-16 rounded cursor-pointer flex items-center justify-center ${
         flipped && !matched ? "bg-orange-500" : ""
       } ${matched && flipped ? "bg-green-500 hover:bg-green-500" : ""}`}
       onClick={handleClick}
