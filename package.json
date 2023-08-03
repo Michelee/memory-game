@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@types/uuid": "^9.0.2",
+    "cypress": "^12.17.2",
     "supabase": "^1.75.3"
   }
 }

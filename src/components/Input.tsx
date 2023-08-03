@@ -14,6 +14,7 @@ export const InputComponent = ({ label, value, name, handleChange }: InputCompon
     </label>
     <input
       name={name}
+      id={name}
       value={value}
       onChange={(e) => handleChange(e.target.value)}
       className="h-8 rounded-sm text-black p-2"
